@@ -1,0 +1,88 @@
+import subprocess
+
+#######################################################
+# Additional SCons Configure check methods
+#######################################################
+def _CheckCCFlag(context, option, extension = ['.cc', '.c']):
+    code = "int main() { return 0; }"
+    ret = True
+    prevCCFLAGS = context.env.get('CCFLAGS', [])[:]
+    prevCFLAGS = context.env.get('CFLAGS', [])[:]
+    prevCXXFLAGS = context.env.get('CXXFLAGS', [])[:]
+    if type(extension) == list:
+        context.Message(context.env.subst('Checking %s/%s compiler support for %s option... ' % (context.env['CC'], context.env['CXX'], option)))
+        context.env.Append(CCFLAGS = [ option ])
+        for e in extension:
+            ret = ret and context.TryCompile(code, e)
+    else:
+        if extension == '.c':
+            context.Message(context.env.subst('Checking %s compiler support for %s option... ' % (context.env['CC'], option)))
+            context.env.Append(CFLAGS = [ option ])
+        else:
+            context.Message(context.env.subst('Checking %s compiler support for %s option... ' % (context.env['CXX'], option)))
+            context.env.Append(CXXFLAGS = [ option ])
+        ret = context.TryCompile(code, extension)
+    if not ret:
+        context.env.Replace(CCFLAGS = prevCCFLAGS,
+                            CFLAGS = prevCFLAGS,
+                            CXXFLAGS = prevCXXFLAGS)
+    context.Result(ret)
+    return ret
+
+def _CheckCFlag(context, option):
+    return _CheckCCFlag(context, option, '.c')
+
+def _CheckCXXFlag(context, option):
+    return _CheckCCFlag(context, option, '.cc')
+
+def _CheckLinkFlag(context, option):
+    code = "int main() { return 0; }"
+    context.Message(context.env.subst('Checking %s linker support for %s option... ' % (context.env['LINK'], option)))
+    prevLINKFLAGS = context.env.get('LINKFLAGS', [])[:]
+    context.env.Append(LINKFLAGS = [ option ])
+    ret = context.TryLink(code, '.c')
+    if not ret:
+        context.env.Replace(LINKFLAGS = prevLINKFLAGS)
+    context.Result(ret)
+    return ret
+
+def _CheckPackage(context, name):
+    import SCons  # Get access to handy internal function SCons.Conftest._Have
+    context.Message(context.env.subst('Checking for package %s... ' % name))
+    ret = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
+    if ret:
+        # Treat include paths from pkg-config as system headers.
+        incfiles = subprocess.check_output(['pkg-config', '--cflags-only-I', name])
+        context.env.Append(CPPFLAGS = incfiles.replace('-I', '-isystem ').split())
+        context.env.ParseConfig('pkg-config --cflags-only-other --libs \'%s\'' % name)
+    comment = "Define to 1 if you have the `%s' package." % name
+    key = 'HAVE_PKG_%s' % name
+    SCons.Conftest._Have(context, key, ret, comment)
+    context.Result(ret)
+    return ret
+
+def _CheckCXXSymbol(context, symbol, parameter_str = "()", includes = ''):
+    import SCons  # Get access to handy internal function SCons.Conftest._Have
+    context.Message(context.env.subst('Checking if symbol %s is defined... ' % symbol))
+    if type(includes) == list:
+        incs = [ i + "\n" for i in includes ]
+    else:
+        incs = includes
+    code = incs + "\nauto __SCONS_TEST__ = %s%s;" % (symbol, parameter_str)
+    ret = context.TryCompile(code, '.cc')
+    comment = 'Define to 1 if you have the \'%s\' symbol.' % symbol
+    key = 'HAVE_%s' % symbol
+    SCons.Conftest._Have(context, key, ret, comment)
+    context.Result(ret)
+    return ret;
+
+custom_tests = {
+    'CheckCCFlag':    _CheckCCFlag,
+    'CheckCFlag':     _CheckCFlag,
+    'CheckCXXFlag':   _CheckCXXFlag,
+    'CheckLinkFlag':  _CheckLinkFlag,
+    'CheckPackage':   _CheckPackage,
+    'CheckCXXSymbol': _CheckCXXSymbol
+}
+
+Return('custom_tests')

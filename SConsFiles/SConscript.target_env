@@ -1,0 +1,38 @@
+Import('project_env', 'host_env')
+
+#######################################################
+# Create target build environment
+#######################################################
+build_dir = project_env['build_dir'] + '/' + project_env['TP']
+install_basedir = project_env['install_basedir'] + '/' + project_env['TP']
+
+
+if project_env['TP'] == 'host':
+    base_env = host_env
+else:
+    base_env = project_env
+
+env = base_env.Clone(
+    build_dir = build_dir,
+    install_basedir = install_basedir,
+    install_bindir = '$install_basedir/bin')
+
+# Add path to host-side tools built as part of the project to the target environment.
+env.PrependENVPath('PATH', host_env['install_bindir'])
+
+#######################################################
+# Setup target platform and toolchain options (if not the same as the host)
+#######################################################
+if base_env != host_env:
+    env['native_build'] = False
+    env['required'] = {}
+    env.SConscript('platforms/SConscript.platform.$TP', exports = ['env'])
+    SConscript('tool_options/SConscript.tool_options', exports = ['env'])
+
+#######################################################
+# Setup target coverage options
+#######################################################
+SConscript('coverage/SConscript.coverage', exports = ['env'])
+
+
+Return('env')

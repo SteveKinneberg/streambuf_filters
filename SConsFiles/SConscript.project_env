@@ -1,0 +1,80 @@
+import os
+import re
+import sys
+
+#######################################################
+# Create the project build environment
+#######################################################
+project_env = Environment(tools = [ 'doxygen' ],
+                          build_dir = '#build/',
+                          install_basedir = '#dist/',
+                          install_bindir = '$install_basedir/bin',
+                          install_incdir = '$install_basedir/include',
+                          install_libdir = '$install_basedir/lib',
+                          install_docdir = '$install_basedir/docs',
+                          install_covdir = '$install_basedir/coverage')
+project_env.SourceCode('.', None)
+
+#######################################################
+# Project build variables
+#######################################################
+# Figure out the available build target platforms
+build_platforms = [ t.split('.', 2)[-1]
+                    for t in os.listdir('platforms/')
+                    if re.match('^SConscript\.platform\.[-_0-9A-Za-z.]+$', t) ]
+
+vars = Variables()
+vars.Add(BoolVariable('V',          'Enable verbose builds.', False))
+vars.Add(BoolVariable('PRODUCTION', 'Select production build. (Suppress debug, code coverage hooks, and built-in library paths.)', False))
+vars.Add(BoolVariable('NDEBUG',     'Suppress debug build information. (Implied to be "yes/true" when PRODUCTION == yes/true.)', False))
+vars.Add(EnumVariable('TP',         'Target platform.', 'host', build_platforms))
+vars.Add(PathVariable('INSTALL_PREFIX',         'System directory to install target files to.',     '/usr/local'))
+vars.Add(PathVariable('INSTALL_BIN_PREFIX',     'System directory to install target binary to.',    '$INSTALL_PREFIX/bin', PathVariable.PathAccept))
+vars.Add(PathVariable('INSTALL_LIB_PREFIX',     'System directory to install target libraries to.', '$INSTALL_PREFIX/lib', PathVariable.PathAccept))
+vars.Add(PathVariable('INSTALL_INCLUDE_PREFIX', 'System directory to install target headers to.',   '$INSTALL_PREFIX/include', PathVariable.PathAccept))
+vars.Add(PathVariable('INSTALL_DOC_PREFIX',     'System directory to install documentation to.',    '$INSTALL_PREFIX/share/doc/iostream_filter', PathVariable.PathAccept))
+vars.Update(project_env)
+Help(vars.GenerateHelpText(project_env))
+
+if project_env['PRODUCTION']:
+    # Production builds never include debug code.
+    project_env['NDEBUG'] = True
+
+#######################################################
+# Setup non-verbose output
+#######################################################
+if not project_env['V']:
+    project_env.Replace(
+        ARCOMSTR =      '\t[AR]      $TARGET',
+        ASCOMSTR =      '\t[AS]      $TARGET',
+        CCCOMSTR =      '\t[CC]      $SOURCE',
+        CXXCOMSTR =     '\t[CXX]     $SOURCE',
+        DOXYGENCOMSTR = '\t[DOXYGEN] $SOURCE',
+        GENHTMLCOMSTR = '\t[GENHTML] $TARGET',
+        INSTALLSTR =    '\t[INSTALL] $TARGET',
+        JARCOMSTR =     '\t[JAR]     $TARGET',
+        JAVACCOMSTR =   '\t[JAVAC]   $SOURCE',
+        LCOVCOMSTR =    '\t[LCOV]    $TARGET',
+        LINKCOMSTR =    '\t[LINK]    $TARGET',
+        RANLIBCOMSTR =  '\t[RANLIB]  $TARGET',
+        SHCCCOMSTR =    '\t[CC-SH]   $SOURCE',
+        SHCXXCOMSTR =   '\t[CXX-SH]  $SOURCE',
+        SHLINKCOMSTR =  '\t[LINK-SH] $TARGET',
+        TESTCOMSTR =    '\t[RUNTEST] $SOURCE'
+    )
+
+    def myprint(s, target, source, env):
+        """Work around bug in SCons for pretty printing [INSTALL] lines."""
+        if s.startswith('[INSTALL]'):
+            sys.stdout.write('\t' + s + '\n')
+        else:
+            sys.stdout.write(s + '\n')
+
+    project_env.Replace(PRINT_CMD_LINE_FUNC = myprint)
+
+#######################################################
+# Setup build alias for the 'all' target
+#######################################################
+project_env.Alias('all', '#')
+
+Return('project_env')

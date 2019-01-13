@@ -1,0 +1,12 @@
+Import('env')
+
+#######################################################
+# Setup common tool options
+#######################################################
+if env['NDEBUG']:
+    env.Append(CPPDEFINES = [ 'NDEBUG' ])
+
+env.Append(CPPPATH = [ env['install_incdir'] ])
+env.Append(LIBPATH = [ env['install_libdir'] ])
+
+SConscript('SConscript.tool_options.' + env['PLATFORM'], exports = [ 'env' ])

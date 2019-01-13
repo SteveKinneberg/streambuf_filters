@@ -1,0 +1,11 @@
+Import('env')
+
+#######################################################
+# Build variables
+#######################################################
+vars = Variables()
+vars.Add(BoolVariable('COVERAGE', 'Enable code coverage reporting.', not env['PRODUCTION']))
+vars.Update(env)
+Help(vars.GenerateHelpText(env))
+
+SConscript('SConscript.coverage.' + env['PLATFORM'], exports = [ 'env' ])
