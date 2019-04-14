@@ -1,0 +1,19 @@
+Import('target_env', 'custom_tests')
+
+#######################################################
+# Create samples environment
+#######################################################
+samples_env = target_env.Clone()
+
+#######################################################
+# Build samples
+#######################################################
+samples_env.AppendUnique(LIBS = [ 'ios_filter' ])
+samples = [
+    samples_env.Program('tabulator_sample', [ 'tabulator_sample.cc' ])
+]
+
+#######################################################
+# Install IOS filter samples
+#######################################################
+samples_env.Install(samples_env['install_bindir'], samples)

@@ -1,0 +1,13 @@
+Import('target_env', 'project_env', 'custom_tests')
+
+#######################################################
+# Create filter environment
+#######################################################
+filter_env = target_env.Clone()
+
+#######################################################
+# Install filter header files
+#######################################################
+includes = filter_env.Install(filter_env['install_incdir'] + "/ios_filter", [ Glob("ios_filter/*.h") ])
+
+project_env['sysinstall_inc'] = includes

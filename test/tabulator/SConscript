@@ -1,0 +1,11 @@
+Import('target_test_env')
+
+scoring_test_env = target_test_env.Clone()
+
+scoring_test_env.AppendUnique(LIBS = [ 'gtest_main', 'pthread' , 'ios_filter'])
+
+prog = scoring_test_env.Program('tabulator_tests', [ Glob('*.cc') ])
+
+test = scoring_test_env.Install(scoring_test_env['install_bindir'], prog)
+
+target_test_env.Append(automated_tests = [test])

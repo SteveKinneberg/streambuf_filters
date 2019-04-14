@@ -1,0 +1,6 @@
+Import('target_test_env')
+
+if target_test_env['have_gtest']:
+    SConscript('tabulator/SConscript')
+else:
+    print('*** Not building unit tests - missing Google Test framework')
