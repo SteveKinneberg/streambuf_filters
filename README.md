@@ -42,8 +42,10 @@ the possible formatting options.
 
 Here is a simple example of how to use the tabulator filter:
 ```
+    using tab = ios_filter::tabulator;
+
     // Wrap the standard streambuf with the tabulator streambuf with 2 10 character wide columns
-    auto filter = ios_filter::tabulator(std::cout, { 10, 10 });
+    auto filter = tab(std::cout, { 10, 10 });
 
     std::cout << ios_filter::set_style(tab::box); // Set the style to use UTF-8 box characters
     std::cout << ios_filter::top_line;            // Draw the top line of the table
@@ -57,6 +59,13 @@ This is the output:
 │ hello      │ world      │
 └────────────┴────────────┘
 ```
+
+### Logging Formatter
+
+This filter simplifies the code necessary for outputting the boilerplate
+information in logging lines.  It even produces nice results for logging entries
+that extend across multiple lines.  It is actually built on top of the tabulator filter
+
 
 ## Possible Future Filters
 
@@ -74,7 +83,6 @@ HTML Encode/Decode.
 (Not developed yet)
 This will translate special characters into HTML escape sequences like for the
 greater than and less than symbols.  This can be combined with the HTML Tabulator.
-
 
 ### UTF-16 Byte Order Conversion
 

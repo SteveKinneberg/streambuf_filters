@@ -10,6 +10,7 @@ samples_env = target_env.Clone()
 #######################################################
 samples_env.AppendUnique(LIBS = [ 'ios_filter' ])
 samples = [
+    samples_env.Program('logger_sample',    [ 'logger_sample.cc' ]),
     samples_env.Program('tabulator_sample', [ 'tabulator_sample.cc' ])
 ]
 
