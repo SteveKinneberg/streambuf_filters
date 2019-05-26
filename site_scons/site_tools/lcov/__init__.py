@@ -4,7 +4,7 @@ from SCons.Builder import Builder
 from SCons.Script import Dir, Flatten, Mkdir
 
 def lcov_generator(source, target, env, for_signature):
-    cmd = [env['LCOV'], '--capture']
+    cmd = [env['LCOV'], '--capture', '--no-external']
     cmd += ['--output-file', target[0].abspath]
 
     if 'LCOVOPTS' in env:

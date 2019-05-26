@@ -4,7 +4,8 @@ Import('env')
 # Build variables
 #######################################################
 vars = Variables()
-vars.Add(BoolVariable('COVERAGE', 'Enable code coverage reporting.', not env['PRODUCTION']))
+#vars.Add(BoolVariable('COVERAGE', 'Enable code coverage reporting.', not env['PRODUCTION']))
+vars.Add(BoolVariable('COVERAGE', 'Enable code coverage reporting.', False))
 vars.Update(env)
 Help(vars.GenerateHelpText(env))
 
