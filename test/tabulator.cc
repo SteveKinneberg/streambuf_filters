@@ -1,5 +1,5 @@
 /**
- * @file ""
+ * @file
  *
  * Unit test file for testing the tabulator streambuf filter.
  *
@@ -58,7 +58,7 @@ std::ostream& operator<< (std::ostream& os, tabulator::style_info const& s)
 }
 
 
-class TabulatorTest: public ::testing::Test {
+class tabulator_test: public ::testing::Test {
   protected:
     std::ostringstream os;
     std::unique_ptr<tabulator> filter;
@@ -77,10 +77,10 @@ class TabulatorTest: public ::testing::Test {
 
 
 template <std::size_t N, std::size_t W = 10>
-class TabulatorColumnTest: public TabulatorTest {
+class tabulator_column_test: public tabulator_test {
   protected:
     void SetUp() override {
-        TabulatorTest::SetUp();
+        tabulator_test::SetUp();
         filter->set_style(tabulator::ascii);
     }
 
@@ -89,8 +89,8 @@ class TabulatorColumnTest: public TabulatorTest {
     }
 };
 
-using Tabulator1ColumnTest = TabulatorColumnTest<1, 10>;
-TEST_F(Tabulator1ColumnTest, Style)
+using tabulator_1_column_test = tabulator_column_test<1, 10>;
+TEST_F(tabulator_1_column_test, Style)
 {
     os << set_style(tabulator::double_box);
     os << '\n' << endc;
@@ -98,13 +98,13 @@ TEST_F(Tabulator1ColumnTest, Style)
 }
 
 
-TEST_F(Tabulator1ColumnTest, Padding)
+TEST_F(tabulator_1_column_test, padding)
 {
     os << set_pad("A", "B") << '\n' << endc;
     EXPECT_EQ(os.str(), "|A          B|\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAsciiCharacter)
+TEST_F(tabulator_1_column_test, wrapping_ascii_character)
 {
     os << set_wrap(wrap::character) << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(),
@@ -112,7 +112,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAsciiCharacter)
               "| jkl        |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAsciiWord)
+TEST_F(tabulator_1_column_test, wrapping_ascii_word)
 {
     os << set_wrap(wrap::word) << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(),
@@ -120,7 +120,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAsciiWord)
               "| ghijkl     |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingUtf8Character)
+TEST_F(tabulator_1_column_test, wrapping_utf8_character)
 {
     os << set_wrap(wrap::character) << R"(ăƀçđêƒ ǧĥïĵǩĺ)" << endc;
     EXPECT_EQ(os.str(),
@@ -128,7 +128,7 @@ TEST_F(Tabulator1ColumnTest, WrappingUtf8Character)
               R"(| ĵǩĺ        |)" "\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingUtf8Word)
+TEST_F(tabulator_1_column_test, wrapping_utf8_word)
 {
     os << set_wrap(wrap::word) << R"(ăƀçđêƒ ǧĥïĵǩĺ)" << endc;
     EXPECT_EQ(os.str(),
@@ -136,7 +136,7 @@ TEST_F(Tabulator1ColumnTest, WrappingUtf8Word)
               R"(| ǧĥïĵǩĺ     |)" "\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace1Character)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_character_1)
 {
     os << set_wrap(wrap::character) << "abcdefghi jklmno" << endc;
     EXPECT_EQ(os.str(),
@@ -144,7 +144,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace1Character)
               "| jklmno     |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace2Character)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_character_2)
 {
     os << set_wrap(wrap::character) << "abcdefghij klmno" << endc;
     EXPECT_EQ(os.str(),
@@ -152,7 +152,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace2Character)
               "| klmno      |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace3Character)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_character_3)
 {
     os << set_wrap(wrap::character) << "abcdefghijk lmno" << endc;
     EXPECT_EQ(os.str(),
@@ -160,7 +160,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace3Character)
               "| k lmno     |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace1Word)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_word_1)
 {
     os << set_wrap(wrap::word) << "abcdefghi jklmno pqrstuv" << endc;
     EXPECT_EQ(os.str(),
@@ -169,7 +169,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace1Word)
               "| pqrstuv    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace2Word)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_word_2)
 {
     os << set_wrap(wrap::word) << "abcdefghij klmno pqrstuv" << endc;
     EXPECT_EQ(os.str(),
@@ -178,7 +178,7 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace2Word)
               "| pqrstuv    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace3Word)
+TEST_F(tabulator_1_column_test, wrapping_at_whitespace_word_3)
 {
     os << set_wrap(wrap::word) << "abcdefghijk lmno pqrstuv" << endc;
     EXPECT_EQ(os.str(),
@@ -187,86 +187,86 @@ TEST_F(Tabulator1ColumnTest, WrappingAtWhitespace3Word)
               "| pqrstuv    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateLeftOneLineShortCharacter)
+TEST_F(tabulator_1_column_test, truncate_left_one_line_short_character)
 {
     os << set_truncate(truncate::left) << "abc" << endc;
     EXPECT_EQ(os.str(), "| abc        |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateLeftOneLineCharacter)
+TEST_F(tabulator_1_column_test, truncate_left_one_line_character)
 {
     os << set_truncate(truncate::left) << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(), "| …ef ghijkl |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateRightOneLineShortCharacter)
+TEST_F(tabulator_1_column_test, truncate_right_one_line_short_character)
 {
     os << set_truncate(truncate::right) << "abc" << endc;
     EXPECT_EQ(os.str(), "| abc        |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateRightOneLineCharacter)
+TEST_F(tabulator_1_column_test, truncate_right_one_line_character)
 {
     os << set_truncate(truncate::right) << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(), "| abcdef gh… |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateLeftOneLineWord)
+TEST_F(tabulator_1_column_test, truncate_left_one_line_word)
 {
     os << set_wrap(wrap::word) << set_truncate(truncate::left)  << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(), "| …ghijkl    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateRightOneLineWord)
+TEST_F(tabulator_1_column_test, truncate_right_one_line_word)
 {
     os << set_wrap(wrap::word) << set_truncate(truncate::right) << "abcdef ghijkl" << endc;
     EXPECT_EQ(os.str(), "| abcdef…    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateLeftMultiLineCharacter)
+TEST_F(tabulator_1_column_test, truncate_left_multiline_character)
 {
     os << set_truncate(truncate::left)  << "123456 ghijkl\nmnopqr stuvwx" << endc;
     EXPECT_EQ(os.str(), "| …qr stuvwx |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateRightMultiLineCharacter)
+TEST_F(tabulator_1_column_test, truncate_right_multiline_character)
 {
     os << set_truncate(truncate::right) << "123456 ghijkl\nmnopqr stuvwx" << endc;
     EXPECT_EQ(os.str(), "| 123456 gh… |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateLeftMultiLineWord)
+TEST_F(tabulator_1_column_test, truncate_left_multiline_word)
 {
     os << set_wrap(wrap::word) << set_truncate(truncate::left)  << "123456 ghijkl\nmnopqr stuvwx" << endc;
     EXPECT_EQ(os.str(), "| …stuvwx    |\n");
 }
 
-TEST_F(Tabulator1ColumnTest, TruncateRightMultiLineWord)
+TEST_F(tabulator_1_column_test, truncate_right_multiline_word)
 {
     os << set_wrap(wrap::word) << set_truncate(truncate::right) << "123456 ghijkl\nmnopqr stuvwx" << endc;
     EXPECT_EQ(os.str(), "| 123456…    |\n");
 }
 
-using Tabulator2ColumnTest = TabulatorColumnTest<2, 10>;
-TEST_F(Tabulator2ColumnTest, ShortLine1)
+using tabulator_2_column_test = tabulator_column_test<2, 10>;
+TEST_F(tabulator_2_column_test, short_line_1)
 {
     os << '\n' << endc << endc;
     EXPECT_EQ(os.str(), "|            |            |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ShortLine2)
+TEST_F(tabulator_2_column_test, short_line_2)
 {
     os << "abc" << endc << endc;
     EXPECT_EQ(os.str(), "| abc        |            |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ShortLine3)
+TEST_F(tabulator_2_column_test, short_line_3)
 {
     os << "abc" << endc << "123" << endc;
     EXPECT_EQ(os.str(), "| abc        | 123        |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ZeroWidth1)
+TEST_F(tabulator_2_column_test, zero_width_1)
 {
     os << set_width(0);
     os << '\n' << endc;
@@ -275,7 +275,7 @@ TEST_F(Tabulator2ColumnTest, ZeroWidth1)
     EXPECT_EQ(os.str(), "|  |  |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ZeroWidth2)
+TEST_F(tabulator_2_column_test, zero_width_2)
 {
     os << set_width(0);
     os << "hello world" << endc;
@@ -284,7 +284,7 @@ TEST_F(Tabulator2ColumnTest, ZeroWidth2)
     EXPECT_EQ(os.str(), "| hello world |  |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ZeroWidth3)
+TEST_F(tabulator_2_column_test, zero_width_3)
 {
     os << set_width(0);
     os << endc;
@@ -293,7 +293,7 @@ TEST_F(Tabulator2ColumnTest, ZeroWidth3)
     EXPECT_EQ(os.str(), "|  | hello world |\n");
 }
 
-TEST_F(Tabulator2ColumnTest, ZeroWidth4)
+TEST_F(tabulator_2_column_test, zero_width_4)
 {
     os << set_width(0);
     os << "hello" << endc;
@@ -303,8 +303,8 @@ TEST_F(Tabulator2ColumnTest, ZeroWidth4)
 }
 
 
-using Tabulator3ColumnTest = TabulatorColumnTest<3, 10>;
-TEST_F(Tabulator3ColumnTest, Justify)
+using tabulator_3_column_test = tabulator_column_test<3, 10>;
+TEST_F(tabulator_3_column_test, justify)
 {
     os << set_justify(justify::right) << "1234" << endc
        << set_justify(justify::center) << "1234" << endc
@@ -314,8 +314,8 @@ TEST_F(Tabulator3ColumnTest, Justify)
 }
 
 
-using TabulatorNestedTest = TabulatorColumnTest<2, 20>;
-TEST_F(TabulatorNestedTest, Nested1)
+using tabulator_nested_test = tabulator_column_test<2, 20>;
+TEST_F(tabulator_nested_test, nested_1)
 {
     os << "one" << endc;
     {
@@ -329,7 +329,7 @@ TEST_F(TabulatorNestedTest, Nested1)
               "|                      | | 678   |       |    |\n");
 }
 
-TEST_F(TabulatorNestedTest, Nested2)
+TEST_F(tabulator_nested_test, nested_2)
 {
     os << "one" << endc;
     {
@@ -345,92 +345,92 @@ TEST_F(TabulatorNestedTest, Nested2)
 
 
 
-using ExpectedStrings = std::array<std::string_view, 4>;
-using TestTuple = std::tuple<tabulator::style_info, ExpectedStrings>;
+using expected_strings = std::array<std::string_view, 4>;
+using test_tuple = std::tuple<tabulator::style_info, expected_strings>;
 
-class TabulatorStyleTest: public TabulatorTest, public ::testing::WithParamInterface<TestTuple> {
+class tabulator_style_test: public tabulator_test, public ::testing::WithParamInterface<test_tuple> {
   protected:
-    ExpectedStrings expected;
+    expected_strings expected;
 
     void SetUp() override {
-        TabulatorTest::SetUp();
+        tabulator_test::SetUp();
         tabulator::style_info style;
         std::tie(style, expected) = GetParam();
         filter->set_style(style);
     }
 
     void TearDown() override {
-        TabulatorTest::TearDown();
+        tabulator_test::TearDown();
     }
 
     tabulator::cells_type GetCells() override { return tabulator::cells_type{ 0, 0 }; }
 };
 
 
-TEST_P(TabulatorStyleTest, TopLine)
+TEST_P(tabulator_style_test, top_line)
 {
     os << top_line;
     EXPECT_EQ(os.str(), expected[0]);
 }
 
-TEST_P(TabulatorStyleTest, HorizLine)
+TEST_P(tabulator_style_test, horiz_line)
 {
     os << horiz_line;
     EXPECT_EQ(os.str(), expected[1]);
 }
 
-TEST_P(TabulatorStyleTest, BottomLine)
+TEST_P(tabulator_style_test, bottom_line)
 {
     os << bottom_line;
     EXPECT_EQ(os.str(), expected[2]);
 }
 
-TEST_P(TabulatorStyleTest, EmptyCells)
+TEST_P(tabulator_style_test, empty_cells)
 {
     os << '\n' << endc << endc << endc;
     EXPECT_EQ(os.str(), expected[3]);
 }
 
 INSTANTIATE_TEST_CASE_P(
-    Styles,
-    TabulatorStyleTest,
+    styles,
+    tabulator_style_test,
     ::testing::Values(
-         TestTuple(tabulator::empty,
+         test_tuple(tabulator::empty,
                    { "\n",
                      "\n",
                      "\n",
                      "    \n" }),
-         TestTuple(tabulator::ascii,
+         test_tuple(tabulator::ascii,
                    { "+--+--+\n",
                      "+--+--+\n",
                      "+--+--+\n",
                      "|  |  |\n" }),
-         TestTuple(tabulator::markdown,
+         test_tuple(tabulator::markdown,
                    { "\n",
                      "--|--\n",
                      "\n",
                      "  |  \n" }),
-         TestTuple(tabulator::box,
+         test_tuple(tabulator::box,
                    { R"(┌──┬──┐)" "\n",
                      R"(├──┼──┤)" "\n",
                      R"(└──┴──┘)" "\n",
                      R"(│  │  │)" "\n"}),
-         TestTuple(tabulator::double_box,
+         test_tuple(tabulator::double_box,
                    { R"(╔══╦══╗)" "\n",
                      R"(╠══╬══╣)" "\n",
                      R"(╚══╩══╝)" "\n",
                      R"(║  ║  ║)" "\n" }),
-         TestTuple(tabulator::heavy_box,
+         test_tuple(tabulator::heavy_box,
                    { R"(┏━━┳━━┓)" "\n",
                      R"(┣━━╋━━┫)" "\n",
                      R"(┗━━┻━━┛)" "\n",
                      R"(┃  ┃  ┃)" "\n" }),
-         TestTuple(tabulator::rounded_box,
+         test_tuple(tabulator::rounded_box,
                    { R"(╭──┬──╮)" "\n",
                      R"(├──┼──┤)" "\n",
                      R"(╰──┴──╯)" "\n",
                      R"(│  │  │)" "\n"}),
-         TestTuple(tabulator::style_info {
+         test_tuple(tabulator::style_info {
                  { "t<", "t|", "t>" , "t-" },
                  { "m<", "m|", "m>" , "m-" },
                  { "b<", "b|", "b>" , "b-" },

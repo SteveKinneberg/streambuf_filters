@@ -1,0 +1,118 @@
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+if (NOT DEFINED ${PROJECT_NAME}_INSTALL_CMAKEDIR)
+   set(${PROJECT_NAME}_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+       CACHE STRING "Path to ${PROJECT_NAME} CMake files")
+endif ()
+
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}_Targets
+    RUNTIME COMPONENT ${PROJECT_NAME}_Runtime
+    LIBRARY COMPONENT ${PROJECT_NAME}_Runtime
+    NAMELINK_COMPONENT ${PROJECT_NAME}_Development
+    ARCHIVE COMPONENT ${PROJECT_NAME}_Development
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+install(DIRECTORY
+    "${${PROJECT_NAME}_SOURCE_DIR}/include/"
+    "${${PROJECT_NAME}_BINARY_DIR}/include/"
+    TYPE INCLUDE
+    COMPONENT ${PROJECT_NAME}_Development)
+
+if (BUILD_DOCUMENTATION)
+    install(DIRECTORY
+        "${${PROJECT_NAME}_BINARY_DIR}/public_docs/html"
+        TYPE DOC
+        COMPONENT ${PROJECT_NAME}_Documentation)
+endif()
+
+install(FILES
+    "${${PROJECT_NAME}_SOURCE_DIR}/README.md"
+    TYPE DOC
+    COMPONENT ${PROJECT_NAME}_Documentation)
+
+if (BUILD_SHARED_LIBS)
+    set(type shared)
+else ()
+    set(type static)
+endif ()
+
+install(EXPORT ${PROJECT_NAME}_Targets
+        DESTINATION "${${PROJECT_NAME}_INSTALL_CMAKEDIR}"
+        NAMESPACE ${PROJECT_NAME}::
+        FILE ${PROJECT_NAME}-${type}-targets.cmake
+        COMPONENT ${PROJECT_NAME}_Development)
+
+write_basic_package_version_file(
+    ${PROJECT_NAME}-config-version.cmake
+    COMPATIBILITY SameMajorVersion)
+
+install(FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+        DESTINATION "${${PROJECT_NAME}_INSTALL_CMAKEDIR}"
+        COMPONENT ${PROJECT_NAME}_Development)
+
+
+if(BUILD_SHARED_LIBS)
+set(CPACK_COMPONENTS_GROUPING ONE_PER_GROUP)
+set(CPACK_PACKAGE_DESCRIPTION "This provides a library implements C++ IO stream filters.")
+
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-source")
+set(CPACK_SOURCE_IGNORE_FILES
+    "/.*build.*/"
+    "/.*Build.*/"
+    "/\.git/"
+    ".*~"
+    ".*\.bak"
+    "*.swp."
+    "\.#.*"
+    "#.*#"
+    "\.vscode"
+)
+
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}")
+
+if(WIN32)
+    set(CPACK_SOURCE_GENERATOR ZIP)
+    set(CPACK_GENERATOR ZIP)
+else()
+    set(CPACK_SOURCE_GENERATOR TXZ)
+    set(CPACK_GENERATOR TXZ)
+endif()
+
+find_program(RPMBUILD_CMD rpmbuild)
+if(RPMBUILD_CMD)
+    list(APPEND CPACK_GENERATOR RPM)
+
+    # CPack is broken in that it includes the directory /usr/lib64/cmake in the package which will
+    # cause the package to fail to install.  The following line fixes that problem.
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/${CMAKE_INSTALL_LIBDIR}/cmake")
+
+    set(CPACK_RPM_COMPONENT_INSTALL ON)
+    set(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+    set(CPACK_RPM_${PROJECT_NAME}_RUNTIME_PACKAGE_NAME       "${PROJECT_NAME}")
+    set(CPACK_RPM_${PROJECT_NAME}_DEVELOPMENT_PACKAGE_NAME   "${PROJECT_NAME}-devel")
+    set(CPACK_RPM_${PROJECT_NAME}_DOCUMENTATION_PACKAGE_NAME "${PROJECT_NAME}-doc")
+    set(CPACK_RPM_${PROJECT_NAME}_RUNTIME_FILE_NAME          "${CPACK_RPM_${PROJECT_NAME}_RUNTIME_PACKAGE_NAME}.rpm")
+    set(CPACK_RPM_${PROJECT_NAME}_DEVELOPMENT_FILE_NAME      "${CPACK_RPM_${PROJECT_NAME}_DEVELOPMENT_PACKAGE_NAME}.rpm")
+    set(CPACK_RPM_${PROJECT_NAME}_DOCUMENTATION_FILE_NAME    "${CPACK_RPM_${PROJECT_NAME}_DOCUMENTATION_PACKAGE_NAME}.rpm")
+endif()
+
+find_program(DEB_CMD dpkg)
+if(DEB_CMD)
+    list(APPEND CPACK_GENERATOR DEB)
+
+    set(CPACK_DEB_COMPONENT_INSTALL ON)
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_RUNTIME_PACKAGE_NAME       "${PROJECT_NAME}")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_DEVELOPMENT_PACKAGE_NAME   "${PROJECT_NAME}-dev")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_DOCUMENTATION_PACKAGE_NAME "${PROJECT_NAME}-doc")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_RUNTIME_FILE_NAME          "${CPACK_DEBIAN_${PROJECT_NAME}_RUNTIME_PACKAGE_NAME}.deb")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_DEVELOPMENT_FILE_NAME      "${CPACK_DEBIAN_${PROJECT_NAME}_DEVELOPMENT_PACKAGE_NAME}.deb")
+    set(CPACK_DEBIAN_${PROJECT_NAME}_DOCUMENTATION_FILE_NAME    "${CPACK_DEBIAN_${PROJECT_NAME}_DOCUMENTATION_PACKAGE_NAME}.deb")
+endif()
+
+include(CPack)
+endif()

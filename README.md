@@ -116,9 +116,5 @@ character, then automatic conversion is possible.
 1. The master branch will always remain stable.  Development branches, however,
    may experience changes in history (i.e., `git rebase -i`).
 
-2. The SCons files for building this project are taken from (the development
-   branch of) the
-   [general-scons](https://github.com/SteveKinneberg/general-scons) project.
-
-3. This project is licensed under the terms of the Apache 2.0 license.  See the
+2. This project is licensed under the terms of the Apache 2.0 license.  See the
    [LICENSE](LICENSE) file for details.

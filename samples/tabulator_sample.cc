@@ -190,10 +190,10 @@ EXAMPLE_CODE(flush_mid_table,
              "Flush mid table",
              using namespace chrono_literals;
              using tab = tabulator;
-             auto filter = tab(cout, { 10, 10 });
+             auto filter = tab(cout, { 13, 10 });
              cout << set_style(tab::box);
              cout << top_line;
-             cout << "Wait 3s" << endc;
+             cout << "Wait 3s" << endl << endl << "Still waiting" << endl << endl << "Finally." << endc;
              cout << "3..." << endl;
              this_thread::sleep_for(1s);
              cout << "2..." << endl;
